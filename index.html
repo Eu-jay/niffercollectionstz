@@ -1,0 +1,824 @@
+<<!DOCTYPE html>
+<html lang="sw" class="scroll-smooth">
+<head>
+    <!-- Firebase App & Firestore SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <!-- ONGEZA HII HAPA CHINI -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niffer Collections | Official Skincare & Beauty Store</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        niffer: {
+                            pink: '#FDF2F4',
+                            accent: '#E05297',
+                            darkpink: '#C2185B',
+                            gold: '#D4AF37',
+                            softbg: '#FFF8F9',
+                            card: '#FFFFFF'
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Playfair Display', 'serif'],
+                        body: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #FFF8F9; }
+        .cosmetics-bg-overlay {
+            background-image: linear-gradient(to bottom, rgba(255, 248, 249, 0.92), rgba(253, 242, 244, 0.96)), 
+                              url('https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1920&q=80');
+            background-repeat: repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+        .heading-font { font-family: 'Playfair Display', serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #E05297; border-radius: 10px; }
+    </style>
+</head>
+<body class="text-gray-800 pb-12 antialiased cosmetics-bg-overlay min-h-screen">
+
+    <!-- TANGAZO LA JUU -->
+    <div class="bg-gradient-to-r from-niffer-accent via-niffer-darkpink to-niffer-gold text-white text-xs md:text-sm py-2 px-4 text-center font-medium shadow-sm sticky top-0 z-50">
+         Official Niffer Collections Store — Mwonekano Na Afya Ya Ngozi Yako Ndio Fahari Yetu! 
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="bg-white/95 backdrop-blur-md border-b border-rose-100 shadow-xs sticky top-[32px] z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('store')">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-niffer-accent to-niffer-gold flex items-center justify-center text-white font-bold text-2xl shadow-md border-2 border-white">
+                        N
+                    </div>
+                    <div>
+                        <span class="text-2xl md:text-3xl font-bold heading-font text-gray-900 tracking-wide block leading-none">NIFFER</span>
+                        <span class="text-xs tracking-widest text-niffer-accent uppercase font-bold">Collections</span>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex space-x-8 text-sm font-medium">
+                    <a href="#home" onclick="switchTab('store')" class="text-gray-700 hover:text-niffer-accent transition">Nyumbani</a>
+                    <a href="#products" onclick="switchTab('store')" class="text-gray-700 hover:text-niffer-accent transition">Bidhaa Zetu</a>
+                    <a href="#about" onclick="switchTab('store')" class="text-gray-700 hover:text-niffer-accent transition">Kuhusu Niffer</a>
+                    <a href="#contact" onclick="switchTab('store')" class="text-gray-700 hover:text-niffer-accent transition">Contacts & Maduka</a>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <button onclick="promptAdminLogin()" class="px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm rounded-full border border-niffer-accent text-niffer-accent hover:bg-niffer-accent hover:text-white font-medium transition flex items-center space-x-2">
+                        <i class="fa-solid fa-lock text-xs"></i>
+                        <span class="hidden sm:inline">Admin Panel</span>
+                    </button>
+                    
+                    <button onclick="toggleCart()" class="relative p-2.5 bg-rose-100 text-niffer-darkpink rounded-full hover:bg-niffer-accent hover:text-white transition">
+                        <i class="fa-solid fa-bag-shopping text-lg"></i>
+                        <span id="cart-count" class="absolute -top-1 -right-1 bg-niffer-accent text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- STORE TAB -->
+    <div id="store-tab">
+        <section id="home" class="relative py-16 md:py-24 border-b border-rose-100/80">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6 text-center md:text-left">
+                        <span class="inline-block px-4 py-1.5 rounded-full bg-rose-100/80 text-niffer-darkpink text-xs font-bold tracking-wider uppercase shadow-xs border border-rose-200">
+                            Official Beauty & Skincare Brand
+                        </span>
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold heading-font text-gray-900 leading-tight">
+                            Ng'aa Na Pendeza Na Bidhaa Halisi Za <span class="text-transparent bg-clip-text bg-gradient-to-r from-niffer-accent to-niffer-gold">Niffer</span>
+                        </h1>
+                        <p class="text-gray-600 text-base md:text-lg max-w-xl mx-auto md:mx-0 leading-relaxed">
+                            Pata sabuni za asili, mafuta ya kung'arisha ngozi, serums, na vipodozi vya kisasa vilivyotengenezwa kwa viwango vya juu zaidi.
+                        </p>
+                        <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 justify-center md:justify-start">
+                            <a href="#products" class="px-8 py-3.5 bg-gradient-to-r from-niffer-accent to-niffer-darkpink text-white font-medium rounded-full shadow-lg hover:opacity-95 transition text-center flex items-center justify-center space-x-2">
+                                <span>Tazama Bidhaa Zote</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="relative flex justify-center">
+                        <div class="w-80 h-[27rem] sm:w-96 sm:h-[29rem] rounded-3xl bg-gradient-to-tr from-niffer-accent via-rose-300 to-niffer-gold p-1 shadow-xl">
+                            <div class="w-full h-full bg-white/95 rounded-[22px] overflow-hidden flex flex-col items-center p-6 text-center justify-between">
+                                <div class="w-36 h-36 rounded-full border-4 border-niffer-accent overflow-hidden shadow-lg mb-2 relative bg-rose-50">
+                                    <img id="display-founder-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80" alt="Niffer" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-bold heading-font text-gray-900">Jeniffer Jovin (Niffer)</h3>
+                                    <p class="text-xs text-niffer-accent font-bold uppercase tracking-wider mt-0.5">Mwanzilishi & Mmiliki</p>
+                                </div>
+                                <p id="display-founder-bio" class="text-xs text-black-500 bold leading-relaxed px-2">
+                                    "Afya na mwonekano wa ngozi yako ndio kipaumbele chetu namba moja."
+                                </p>
+                                <div class="w-full pt-2">
+                                    <a href="#contact" class="text-xs font-bold text-niffer-darkpink hover:underline">
+                                        <i class="fa-solid fa-phone mr-1"></i> Wasiliana Nasi & Mitandao Yetu →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="products" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <span class="text-niffer-accent font-bold text-xs tracking-widest uppercase">Orodha Ya Bidhaa</span>
+                <h2 class="text-3xl sm:text-4xl font-bold heading-font text-gray-900 mt-1">Chagua Bidhaa Unayohitaji</h2>
+            </div>
+            <div class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10" id="category-buttons"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="product-grid"></div>
+        </section>
+
+        <section id="contact" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <div class="text-center max-w-2xl mx-auto">
+                <span class="text-niffer-accent font-bold text-xs tracking-widest uppercase">Mawasiliano & Maduka</span>
+                <h2 class="text-3xl font-bold heading-font text-gray-900 mt-1">Contacts & Maduka Yetu</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="contacts-display-container"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="stores-display-container"></div>
+        </section>
+    </div>
+
+    <!-- ADMIN TAB -->
+    <div id="admin-tab" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="bg-white/95 backdrop-blur-md rounded-3xl border border-rose-200 p-6 sm:p-10 shadow-lg space-y-10">
+            <div class="flex justify-between items-center pb-6 border-b border-gray-100">
+                <div>
+                    <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 font-bold text-xs rounded-full mb-1">Admin Panel (Cloud Firebase)</span>
+                    <h2 class="text-2xl font-bold heading-font text-gray-900">Usimamizi wa Tovuti</h2>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="logoutAdmin()" class="px-4 py-2 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full">Toka</button>
+                    <button onclick="switchTab('store')" class="px-4 py-2 bg-rose-100 text-niffer-darkpink text-xs font-semibold rounded-full">← Angalia Duka</button>
+                </div>
+            </div>
+
+            <!-- 1. PROFILE -->
+            <div class="bg-niffer-softbg/80 p-6 rounded-2xl border border-rose-100 space-y-4">
+                <h3 class="font-bold text-base text-gray-900">1. Badilisha Wasifu wa Niffer</h3>
+                <form onsubmit="handleSaveFounderProfile(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Picha URL au Weka Picha Mpya</label>
+                        <input type="text" id="admin-founder-img-url" placeholder="Weka image URL au tumia faili hapa chini" class="w-full px-3 py-2 rounded-xl border border-rose-200 text-xs bg-white mb-2">
+                        <input type="file" id="admin-founder-file" accept="image/*" class="w-full text-xs text-gray-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs bold text-black-700 mb-1">Bio / Maelezo</label>
+                        <textarea id="admin-founder-bio-input" rows="2" required class="w-full px-4 py-2 rounded-xl border border-rose-200 text-xs bg-white"></textarea>
+                    </div>
+                    <button type="submit" class="py-2 px-6 bg-niffer-accent text-white text-xs font-bold rounded-xl">Hifadhi Wasifu</button>
+                </form>
+            </div>
+
+            <!-- 2. CONTACTS -->
+            <div class="bg-niffer-softbg/80 p-6 rounded-2xl border border-rose-100 space-y-4">
+                <h3 class="font-bold text-base text-gray-900">2. Ongeza Contacts / Mitandao</h3>
+                <form onsubmit="handleAddContact(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-white p-4 rounded-xl border border-rose-100">
+                    <input type="text" id="new-con-name" required placeholder="WhatsApp / Instagram" class="px-3 py-2 rounded-xl border text-xs">
+                    <input type="text" id="new-con-target" required placeholder="+2557XXXXXXXX" class="px-3 py-2 rounded-xl border text-xs">
+                    <button type="submit" class="py-2 bg-niffer-accent text-white text-xs font-bold rounded-xl">+ Ongeza</button>
+                </form>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="admin-contacts-list"></div>
+            </div>
+
+            <!-- 3. STORES -->
+            <div class="bg-niffer-softbg/80 p-6 rounded-2xl border border-rose-100 space-y-4">
+                <h3 class="font-bold text-base text-gray-900">3. Ongeza Maduka</h3>
+                <form onsubmit="handleAddStore(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white p-4 rounded-xl border border-rose-100">
+                    <input type="text" id="new-store-name" required placeholder="Duka la Mwanza" class="px-3 py-2 rounded-xl border text-xs">
+                    <input type="text" id="new-store-info" required placeholder="Eneo | Saa za Kazi | Simu" class="px-3 py-2 rounded-xl border text-xs">
+                    <button type="submit" class="py-2 bg-niffer-accent text-white text-xs font-bold rounded-xl">+ Ongeza Duka</button>
+                </form>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="admin-stores-list"></div>
+            </div>
+
+            <!-- 4. PRODUCTS -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <div class="bg-niffer-softbg/80 p-6 rounded-2xl border border-rose-100 space-y-4">
+                    <h3 class="font-bold text-base text-gray-900">4. Ongeza Kategoria</h3>
+                    <form onsubmit="handleAddCategory(event)" class="space-y-4">
+                        <input type="text" id="admin-category-name" required placeholder="Perfumes" class="w-full px-4 py-2 rounded-xl border text-xs bg-white">
+                        <button type="submit" class="w-full py-2 bg-niffer-accent text-white text-xs font-bold rounded-xl">Hifadhi Kategoria</button>
+                    </form>
+                </div>
+
+                <div class="lg:col-span-2 bg-niffer-softbg/80 p-6 rounded-2xl border border-rose-100 space-y-4">
+                    <h3 class="font-bold text-base text-gray-900">5. Upload Bidhaa Mpya</h3>
+                    <form onsubmit="handleAddProduct(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <input type="text" id="admin-product-title" required placeholder="Jina la Bidhaa" class="px-4 py-2 rounded-xl border text-xs bg-white">
+                            <select id="admin-product-category" required class="px-4 py-2 rounded-xl border text-xs bg-white"></select>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <input type="number" id="admin-product-price" required placeholder="Bei (TZS)" class="px-4 py-2 rounded-xl border text-xs bg-white">
+                            <input type="file" id="admin-product-file" accept="image/*" required class="text-xs">
+                        </div>
+                        <textarea id="admin-product-desc" rows="2" required placeholder="Maelezo..." class="w-full px-4 py-2 rounded-xl border text-xs bg-white"></textarea>
+                        <button type="submit" class="w-full py-2.5 bg-niffer-accent text-white text-xs font-bold rounded-xl">Upload Bidhaa</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="border-t pt-6">
+                <h3 class="font-bold text-base text-gray-900 mb-4">6. Futa Bidhaa Zilizopo</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="admin-product-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCT MODAL -->
+    <div id="product-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative p-6">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <!-- CART DRAWER -->
+    <div id="cart-drawer" class="fixed inset-0 bg-black/50 z-50 hidden flex justify-end">
+        <div class="w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between p-6 overflow-y-auto">
+            <div>
+                <div class="flex justify-between items-center pb-4 border-b">
+                    <h3 class="text-xl font-bold">Kikapu Chako</h3>
+                    <button onclick="toggleCart()"><i class="fa-solid fa-xmark text-xl"></i></button>
+                </div>
+                <div id="cart-items" class="py-4 space-y-4"></div>
+            </div>
+            <div class="border-t pt-4 space-y-4">
+                <div class="flex justify-between font-bold text-lg">
+                    <span>Jumla Kuu:</span>
+                    <span id="cart-total" class="text-niffer-darkpink">0 TZS</span>
+                </div>
+                <select id="checkout-contact-select" class="w-full px-3 py-2 rounded-xl border text-xs font-medium"></select>
+                <button onclick="sendOrder()" class="w-full py-3 bg-niffer-accent text-white font-bold rounded-full text-sm">Tuma Oda Sasa</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE INITIALIZATION & LOGIC -->
+    <script>
+        // WEKA FIREBASE CONFIG YAKO HAPA CHINI
+        const firebaseConfig = {
+            apiKey:"AIzaSyBFBARvsNF0nG7qEUBNVN4zR3Ki5V8-jOc",
+            authDomain:  "niffer-909e0.firebaseapp.com",
+            projectId:"niffer-909e0",
+            storageBucket: "niffer-909e0.firebasestorage.app",
+            messagingSenderId:"663807286858",
+            appId:"1:663807286858:web:b5c89e65403753b52c90b3",
+            measurementId:"G-8R22ZF52SR"
+        }
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let categories = ["Vyote", "Mafuta ya Ngozi", "Sabuni & Cleansers", "Serums & Scrubs", "Nguo & Mavazi"];
+        let products = [];
+        let contacts = [];
+        let stores = [];
+        let profile = { img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80", bio: '"Afya na mwonekano wa ngozi yako ndio kipaumbele chetu namba moja."' };
+        
+        let cart = [];
+        let activeCategory = "Vyote";
+        let isAdminLoggedIn = false;
+
+        // LOAD DATA FROM FIRESTORE REALTIME
+        function loadDataFromCloud() {
+            // Profile
+            db.collection("settings").doc("profile").onSnapshot(doc => {
+                if(doc.exists) {
+                    profile = doc.data();
+                    document.getElementById('display-founder-img').src = profile.img;
+                    document.getElementById('display-founder-bio').innerText = profile.bio;
+                    document.getElementById('admin-founder-bio-input').value = profile.bio.replace(/^"|"$/g, '');
+                    document.getElementById('admin-founder-img-url').value = profile.img;
+                }
+            });
+
+            // Products
+            db.collection("products").onSnapshot(snapshot => {
+                products = [];
+                snapshot.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
+                renderProducts();
+            });
+
+            // Contacts
+            db.collection("contacts").onSnapshot(snapshot => {
+                contacts = [];
+                snapshot.forEach(doc => contacts.push({ id: doc.id, ...doc.data() }));
+                renderContactsDisplay();
+                renderAdminContacts();
+                renderCheckoutContactSelect();
+            });
+
+            // Stores
+            db.collection("stores").onSnapshot(snapshot => {
+                stores = [];
+                snapshot.forEach(doc => stores.push({ id: doc.id, ...doc.data() }));
+                renderStoresDisplay();
+                renderAdminStores();
+            });
+
+            // Categories
+            db.collection("settings").doc("categories").onSnapshot(doc => {
+                if(doc.exists) {
+                    categories = doc.data().list || categories;
+                    renderCategories();
+                }
+            });
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('category-buttons');
+            const selectContainer = document.getElementById('admin-product-category');
+            if(!container || !selectContainer) return;
+            
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterCategory('${cat}')" class="px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition ${activeCategory === cat ? 'bg-niffer-accent text-white shadow-md' : 'bg-white/90 border border-rose-100 text-gray-600 hover:bg-rose-50'}">
+                    ${cat}
+                </button>
+            `).join('');
+
+            selectContainer.innerHTML = categories.filter(c => c !== "Vyote").map(cat => `
+                <option value="${cat}">${cat}</option>
+            `).join('');
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('product-grid');
+            if(!container) return;
+            const filtered = activeCategory === "Vyote" ? products : products.filter(p => p.category === activeCategory);
+
+            if(filtered.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center text-gray-400 py-12">Hakuna bidhaa kwenye kategoria hii.</p>`;
+                renderAdminProducts();
+                return;
+            }
+
+            container.innerHTML = filtered.map(p => `
+                <div class="bg-white/95 rounded-3xl border border-rose-100 overflow-hidden shadow-xs hover:shadow-xl transition duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="h-64 sm:h-72 bg-rose-50 overflow-hidden relative cursor-pointer" onclick="openProductModal('${p.id}')">
+                            <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <span class="absolute top-3 right-3 bg-white/90 px-3 py-1 rounded-full text-xs font-bold text-niffer-darkpink">${p.category}</span>
+                        </div>
+                        <div class="p-5 space-y-2">
+                            <h3 class="font-bold text-gray-900 text-lg cursor-pointer hover:text-niffer-accent transition" onclick="openProductModal('${p.id}')">${p.title}</h3>
+                            <p class="text-xs text-gray-500 line-clamp-2">${p.desc}</p>
+                        </div>
+                    </div>
+                    <div class="p-5 pt-0 flex justify-between items-center border-t border-rose-50 mt-2">
+                        <div>
+                            <span class="text-xs text-gray-400 block">price:</span>
+                            <span class="text-base font-bold text-niffer-darkpink">${(p.price || 0).toLocaleString()}. TZS</span>
+                        <button onclick="addToCart('${p.id}')" class="px-4 py-2 bg-rose-100 text-niffer-darkpink hover:bg-niffer-accent hover:text-white rounded-full text-xs font-bold transition">
+                            <i class="fa-solid fa-plus"></i> Weka Kikapuni
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            renderAdminProducts();
+        }
+
+        function renderAdminProducts() {
+            const container = document.getElementById('admin-product-list');
+            if(!container) return;
+            container.innerHTML = products.map(p => `
+                <div class="flex items-center justify-between p-3 bg-white border border-rose-100 rounded-2xl text-xs">
+                    <div class="flex items-center space-x-3">
+                        <img src="${p.image}" class="w-10 h-10 rounded-lg object-cover">
+                        <div>
+                            <h4 class="font-bold text-gray-900">${p.title}</h4>
+                            <span class="text-niffer-darkpink">${p.price.toLocaleString()} TZS</span>
+                        </div>
+                    </div>
+                    <button onclick="deleteProduct('${p.id}')" class="px-3 py-1 bg-rose-100 text-rose-700 rounded-lg font-bold">Futa</button>
+                </div>
+            `).join('');
+        }
+
+        function renderContactsDisplay() {
+            const container = document.getElementById('contacts-display-container');
+            if(!container) return;
+            container.innerHTML = contacts.map(con => {
+                let icon = "fa-phone";
+                let link = "#";
+                let t = con.target;
+                let lower = con.name.toLowerCase();
+
+                if(lower.includes('insta')) { icon = "fa-brands fa-instagram"; link = `https://www.instagram.com/${t.replace('@', '')}`; }
+                else if(lower.includes('whats')) { icon = "fa-brands fa-whatsapp"; link = `https://wa.me/${t.replace('+', '')}`; }
+                else if(lower.includes('tik')) { icon = "fa-brands fa-tiktok"; link = `https://www.tiktok.com/${t}`; }
+                else if(lower.includes('simu') || lower.includes('call')) { icon = "fa-phone-volume"; link = `tel:${t}`; }
+                else { icon = "fa-comment-sms"; link = `sms:${t}`; }
+
+                return `
+                    <a href="${link}" target="_blank" class="bg-rose-50 text-niffer-accent border border-rose-100 p-5 rounded-3xl flex items-center space-x-4 shadow-xs hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-xl shadow-xs">
+                            <i class="fa-solid ${icon}"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-gray-900">${con.name}</h4>
+                            <p class="text-xs text-gray-600 font-medium mt-0.5">${con.target}</p>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        function renderAdminContacts() {
+            const container = document.getElementById('admin-contacts-list');
+            if(!container) return;
+            container.innerHTML = contacts.map(con => `
+                <div class="bg-white p-3 rounded-xl border flex justify-between text-xs items-center">
+                    <div><b>${con.name}</b>: ${con.target}</div>
+                    <button onclick="deleteContact('${con.id}')" class="px-2 py-1 bg-rose-100 text-rose-700 rounded font-bold">Futa</button>
+                </div>
+            `).join('');
+        }
+
+        function renderStoresDisplay() {
+            const container = document.getElementById('stores-display-container');
+            if(!container) return;
+            container.innerHTML = stores.map(store => `
+                <div class="bg-white/90 p-8 rounded-3xl border border-rose-100 shadow-xs">
+                    <div class="w-12 h-12 bg-rose-100 text-niffer-accent rounded-2xl flex items-center justify-center text-xl mb-4"><i class="fa-solid fa-store"></i></div>
+                    <h3 class="text-xl font-bold heading-font text-gray-900 mb-2">${store.name}</h3>
+                    <p class="text-gray-600 text-sm"><i class="fa-solid fa-location-dot text-niffer-accent mr-2"></i> ${store.info}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderAdminStores() {
+            const container = document.getElementById('admin-stores-list');
+            if(!container) return;
+            container.innerHTML = stores.map(store => `
+                <div class="bg-white p-3 rounded-xl border flex justify-between text-xs items-center">
+                    <div><b>${store.name}</b>: ${store.info}</div>
+                    <button onclick="deleteStore('${store.id}')" class="px-2 py-1 bg-rose-100 text-rose-700 rounded font-bold">Futa</button>
+                </div>
+            `).join('');
+        }
+
+        function renderCheckoutContactSelect() {
+            const select = document.getElementById('checkout-contact-select');
+            if(!select) return;
+            select.innerHTML = contacts.map(con => `<option value="${con.id}">${con.name} (${con.target})</option>`).join('');
+        }
+
+        // ADMIN ACTIONS
+        function handleSaveFounderProfile(e) {
+            e.preventDefault();
+            const bioText = document.getElementById('admin-founder-bio-input').value.trim();
+            const urlInput = document.getElementById('admin-founder-img-url').value.trim();
+            const fileInput = document.getElementById('admin-founder-file');
+            let img = urlInput || profile.img;
+
+            if(fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    img = evt.target.result;
+                    saveProfileToDb(img, `"${bioText}"`);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                saveProfileToDb(img, `"${bioText}"`);
+            }
+        }
+
+        function saveProfileToDb(img, bio) {
+            db.collection("settings").doc("profile").set({ img, bio }).then(() => {
+                alert("Wasifu umehifadhiwa mtandaoni kikamilifu!");
+            });
+        }
+
+        function handleAddContact(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-con-name').value;
+            const target = document.getElementById('new-con-target').value;
+            db.collection("contacts").add({ name, target }).then(() => {
+                document.getElementById('new-con-name').value = '';
+                document.getElementById('new-con-target').value = '';
+                alert("Contact imeongezwa mtandaoni!");
+            });
+        }
+
+        function deleteContact(id) {
+            if(confirm("Futa contact hii?")) db.collection("contacts").doc(id).delete();
+        }
+
+        function handleAddStore(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-store-name').value;
+            const info = document.getElementById('new-store-info').value;
+            db.collection("stores").add({ name, info }).then(() => {
+                document.getElementById('new-store-name').value = '';
+                document.getElementById('new-store-info').value = '';
+                alert("Duka limeongezwa mtandaoni!");
+            });
+        }
+
+        function deleteStore(id) {
+            if(confirm("Futa duka hili?")) db.collection("stores").doc(id).delete();
+        }
+
+        function handleAddCategory(e) {
+            e.preventDefault();
+            const name = document.getElementById('admin-category-name').value.trim();
+            if(name && !categories.includes(name)) {
+                categories.push(name);
+                db.collection("settings").doc("categories").set({ list: categories }).then(() => {
+                    document.getElementById('admin-category-name').value = '';
+                    alert("Kategoria imeongezwa!");
+                });
+            }
+        }
+
+        function handleAddProduct(e) {
+            e.preventDefault();
+            const title = document.getElementById('admin-product-title').value;
+            const category = document.getElementById('admin-product-category').value;
+            const price = parseFloat(document.getElementById('admin-product-price').value);
+            const desc = document.getElementById('admin-product-desc').value;
+            const fileInput = document.getElementById('admin-product-file');
+
+            if(fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    db.collection("products").add({
+                        title, category, price, desc,
+                        image: evt.target.result,
+                        usage: "Paka au tumia kama ilivyoelekezwa."
+                    }).then(() => {
+                        e.target.reset();
+                        alert("Bidhaa imewekwa mtandaoni!");
+                        switchTab('store');
+                    });
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        function deleteProduct(id) {
+            if(confirm("Futa bidhaa hii?")) db.collection("products").doc(id).delete();
+        }
+
+        // CART & CHECKOUT
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            const exist = cart.find(item => item.id === id);
+            if(exist) exist.qty += 1;
+            else cart.push({...product, qty: 1});
+            renderCart();
+            toggleCart();
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if(item) {
+                item.qty += delta;
+                if(item.qty <= 0) cart = cart.filter(i => i.id !== id);
+            }
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            const countBadge = document.getElementById('cart-count');
+            const totalSpan = document.getElementById('cart-total');
+            if(!container) return;
+
+            countBadge.innerText = cart.reduce((acc, item) => acc + item.qty, 0);
+
+            if(cart.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-400 py-12 text-sm">Kikapu chako kiko wazi.</p>`;
+                totalSpan.innerText = "0 TZS";
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                const sub = item.price * item.qty;
+                total += sub;
+                return `
+                    <div class="flex justify-between items-center border-b pb-3">
+                        <div>
+                            <h4 class="font-bold text-sm text-gray-800">${item.title}</h4>
+                            <p class="text-xs text-niffer-darkpink font-bold">${item.price.toLocaleString()} TZS x ${item.qty} = ${sub.toLocaleString()} TZS</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="changeQty('${item.id}', -1)" class="w-7 h-7 rounded-full bg-gray-100 font-bold">-</button>
+                            <span class="text-xs font-bold w-4 text-center">${item.qty}</span>
+                            <button onclick="changeQty('${item.id}', 1)" class="w-7 h-7 rounded-full bg-gray-100 font-bold">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            totalSpan.innerText = `${total.toLocaleString()} TZS`;
+            renderCheckoutContactSelect();
+        }
+
+        function openProductModal(id) {
+            const p = products.find(item => item.id === id);
+            if(!p) return;
+            document.getElementById('modal-content').innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="h-64 bg-rose-50 rounded-2xl overflow-hidden"><img src="${p.image}" class="w-full h-full object-cover"></div>
+                    <div class="space-y-4 flex flex-col justify-between">
+                        <div>
+                            <span class="px-3 py-1 bg-rose-100 text-niffer-darkpink text-xs font-bold rounded-full">${p.category}</span>
+                            <h2 class="text-2xl font-bold heading-font mt-2">${p.title}</h2>
+                            <p class="text-xl font-bold text-niffer-accent mt-1">${p.price.toLocaleString()} TZS</p>
+                            <p class="text-xs text-gray-600 mt-2">${p.desc}</p>
+                        </div>
+                        <button onclick="addToCart('${p.id}'); closeProductModal();" class="w-full py-3 bg-niffer-accent text-white font-bold rounded-xl text-sm">Weka Kikapuni</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
+        function filterCategory(cat) { activeCategory = cat; renderCategories(); renderProducts(); }
+        function toggleCart() { document.getElementById('cart-drawer').classList.toggle('hidden'); }
+
+        function promptAdminLogin() {
+            if(isAdminLoggedIn) { switchTab('admin'); return; }
+            const pass = prompt("Ingiza Password ya Admin (niffer123):");
+            if(pass === "niffer123") { isAdminLoggedIn = true; switchTab('admin'); }
+            else if(pass !== null) alert("Password sio sahihi!");
+        }
+
+        function logoutAdmin() { isAdminLoggedIn = false; switchTab('store'); }
+        function switchTab(tab) {
+            document.getElementById('store-tab').classList.toggle('hidden', tab !== 'store');
+            document.getElementById('admin-tab').classList.toggle('hidden', tab !== 'admin');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function sendOrder() {
+            if(cart.length === 0) { alert("Kikapu kiko wazi!"); return; }
+            const selectedId = document.getElementById('checkout-contact-select').value;
+            const con = contacts.find(c => c.id === selectedId);
+            if(!con) { alert("Chagua contact!"); return; }
+
+            let summary = "Habari Niffer Collections, nataka kuagiza:\n\n";
+            let total = 0;
+            cart.forEach((item, i) => {
+                const sub = item.price * item.qty;
+                total += sub;
+                summary += `${i + 1}. ${item.title} (x${item.qty}) - ${sub.toLocaleString()} TZS\n`;
+            });
+            summary += `\nJumla Kuu: ${total.toLocaleString()} TZS`;
+
+            navigator.clipboard.writeText(summary).then(() => {
+                alert(`Orodha imekopiwa! Unatumiwa kwenda ${con.name} (${con.target}).`);
+                let link = "#";
+                let t = con.target;
+                let lower = con.name.toLowerCase();
+
+                if(lower.includes('insta')) link = `https://www.instagram.com/${t.replace('@', '')}`;
+                else if(lower.includes('whats')) link = `https://wa.me/${t.replace('+', '')}?text=` + encodeURIComponent(summary);
+                else if(lower.includes('tik')) link = `https://www.tiktok.com/${t}`;
+                else if(lower.includes('simu') || lower.includes('call')) link = `tel:${t}`;
+                else link = `sms:${t}?body=` + encodeURIComponent(summary);
+
+                window.open(link, '_blank');
+            });
+        }
+
+        loadDataFromCloud();
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth(); // Ongeza hii
+        // INUA ADMIN LOGIN KUTUMIA FIREBASE AUTH
+        function promptAdminLogin() {
+            let email = prompt("Weka Email ya Admin:");
+            if (!email) return;
+            let password = prompt("Weka Password ya Admin:");
+            if (!password) return;
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    isAdminLoggedIn = true;
+                    document.getElementById('store-tab').classList.add('hidden');
+                    document.getElementById('admin-tab').classList.remove('hidden');
+                    alert("Karibu kwenye Admin Panel ya Niffer Collections!");
+                })
+                .catch((error) => {
+                    alert("Imeshindwa kuingia: Email au Password si sahihi!");
+                    console.error(error);
+                });
+        }
+
+        function logoutAdmin() {
+            auth.signOut().then(() => {
+                isAdminLoggedIn = false;
+                document.getElementById('admin-tab').classList.add('hidden');
+                document.getElementById('store-tab').classList.remove('hidden');
+                alert("Umejitokeza (Logged out) kwa mafanikio.");
+            });
+        }
+
+        // KITENZI CHA KUBADILISHA PASSWORD YA ADMIN
+        function handleChangeAdminPassword(e) {
+            e.preventDefault();
+            const oldPass = document.getElementById('admin-old-pass').value;
+            const newPass = document.getElementById('admin-new-pass').value;
+            const user = auth.currentUser;
+
+            if (!user) {
+                alert("Tafadhali ingia tena kama Admin.");
+                return;
+            }
+
+            // Kwanza tunamfanya ahakikiwe upya kwa password ya zamani kwa usalama
+            const credential = firebase.auth.EmailAuthProvider.credential(user.email, oldPass);
+            
+            user.reauthenticateWithCredential(credential).then(() => {
+                // Ikiwa sahihi, badilisha na kuweka mpya
+                user.updatePassword(newPass).then(() => {
+                    alert("Password imebadilishwa mafanikio! Tumia password mpya kuanzia sasa.");
+                    document.getElementById('admin-old-pass').value = '';
+                    document.getElementById('admin-new-pass').value = '';
+                }).catch((error) => {
+                    alert("Hitilafu wakati wa kubadilisha password: " + error.message);
+                });
+            }).catch((error) => {
+                alert("Password ya sasa uliyoweka si sahihi!");
+            });
+        }
+
+        // Pakia data kutoka Cloud kama kawaida...
+        function loadDataFromCloud() {
+            db.collection("settings").doc("profile").onSnapshot(doc => {
+                if(doc.exists) {
+                    profile = doc.data();
+                    document.getElementById('display-founder-img').src = profile.img;
+                    document.getElementById('display-founder-bio').innerText = profile.bio;
+                    document.getElementById('admin-founder-bio-input').value = profile.bio.replace(/^"|"$/g, '');
+                    document.getElementById('admin-founder-img-url').value = profile.img;
+                }
+            });
+
+            db.collection("products").onSnapshot(snapshot => {
+                products = [];
+                snapshot.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
+                renderProducts();
+            });
+
+            db.collection("contacts").onSnapshot(snapshot => {
+                contacts = [];
+                snapshot.forEach(doc => contacts.push({ id: doc.id, ...doc.data() }));
+                renderContactsDisplay();
+                renderAdminContacts();
+                renderCheckoutContactSelect();
+            });
+
+            db.collection("stores").onSnapshot(snapshot => {
+                stores = [];
+                snapshot.forEach(doc => stores.push({ id: doc.id, ...doc.data() }));
+                renderStoresDisplay();
+                renderAdminStores();
+            });
+
+            db.collection("settings").doc("categories").onSnapshot(doc => {
+                if(doc.exists) {
+                    categories = doc.data().list || categories;
+                    renderCategories();
+                }
+            });
+        }
+
+        // Anzisha mzigo wa data ukurasa ukifunguka
+        window.onload = function() {
+            loadDataFromCloud();
+        };
+    </script>
+</body>
+</html>
